@@ -66,15 +66,18 @@ select{padding:6px 8px;border:1px solid var(--line-2);border-radius:6px;backgrou
 .tag.on{border-color:var(--accent);color:var(--accent)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.ranks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr));gap:8px}
-.rank{appearance:none;font:inherit;color:inherit;text-align:left;cursor:pointer;display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}
+.ranks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr));gap:6px}
+.hemis{align-items:start}
+.hemi{padding:12px;border-radius:12px;background:var(--bg)}
+.hemi .ranks{margin-top:4px}
+.rank{appearance:none;font:inherit;color:inherit;text-align:left;cursor:pointer;display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}
 .rank:hover{border-color:var(--line-2)}
 .rank[aria-pressed="false"]{opacity:.35}
-.rank .rk{width:40px;height:40px;border-radius:50%;border:3.5px solid;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1}
+.rank .rk{width:32px;height:32px;border-radius:50%;border:3px solid;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:15px;line-height:1}
 .rank .nm{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.rank .nm b{display:block;font-family:var(--f-display);font-size:15px;font-weight:600;color:var(--ink)}
+.rank .nm b{font-family:var(--f-display);font-size:14.5px;font-weight:600;color:var(--ink)}
 .rank .seats{text-align:right;line-height:1.1}
-.rank .seats b{font-family:var(--f-display);font-size:28px;font-weight:700}
+.rank .seats b{font-family:var(--f-display);font-size:22px;font-weight:700}
 .rank .seats small{display:block;font-size:11.5px;font-family:var(--f-mono)}
 .up{color:var(--p-kt)} .down{color:var(--accent)} .same{color:var(--muted)}
 .sw{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
@@ -198,10 +201,9 @@ footer a{color:var(--accent)}
       <p class="sub">แต่ละจุดคือ สส. 1 คน เรียงพรรคตำแหน่งเดียวกันทั้งสองฝั่ง เส้นกลางคือเกณฑ์เสียงข้างมาก กดการ์ดพรรคเพื่อเน้น</p>
     </div>
     <div class="hemis">
-      <div class="hemi"><div class="hemi-title"><h3>กติกาจริง 2569</h3><span class="tag" id="t-actual"></span></div><svg id="hemi-actual" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาจริง"></svg></div>
-      <div class="hemi"><div class="hemi-title"><h3 id="scen-title">กติกาที่เลือก</h3><span class="tag on" id="t-scen"></span></div><svg id="hemi-scen" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาที่เลือก"></svg></div>
+      <div class="hemi"><div class="hemi-title"><h3>กติกาจริง 2569</h3><span class="tag" id="t-actual"></span></div><svg id="hemi-actual" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาจริง"></svg><div class="ranks" id="ranks-actual" role="group" aria-label="อันดับพรรค กติกาจริง"></div></div>
+      <div class="hemi"><div class="hemi-title"><h3 id="scen-title">กติกาที่เลือก</h3><span class="tag on" id="t-scen"></span></div><svg id="hemi-scen" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาที่เลือก"></svg><div class="ranks" id="ranks-scen" role="group" aria-label="อันดับพรรค กติกาที่เลือก"></div></div>
     </div>
-    <div class="ranks" id="ranks" role="group" aria-label="อันดับพรรคตามกติกาที่เลือก กดเพื่อเน้น"></div>
     <div class="legend" id="legend"></div>
     <div class="kpis" id="kpis"></div>
   </section>
@@ -378,19 +380,22 @@ function describe(c){
   const m = {parallel:"บัญชีรายชื่อแยกขาด", regional:"แบ่ง 8 กลุ่มจังหวัด", mma:"ชดเชยแบบที่นั่งพึงมี", pure:"สัดส่วนล้วน"}[c.mode];
   return `${m}, บัญชีรายชื่อ ${c.pl} ที่นั่ง, เกณฑ์ขั้นต่ำ ${c.thr}%, สูตร ${$("#k-method").selectedOptions[0].text}, ใช้คะแนน${c.src==="pl"?"บัตรบัญชีรายชื่อ":"บัตรแบ่งเขต"}`;
 }
-function renderLegend(order, R){
-  const ranked = Object.entries(R.total).sort((x,y)=>y[1]-x[1]||(A.total[y[0]]||0)-(A.total[x[0]]||0));
-  const shown = ranked.slice(0, 12);
-  const otherSeats = ranked.slice(12).reduce((s,[,n])=>s+n,0);
-  $("#ranks").innerHTML = shown.map(([k,n],i)=>{ const a=A.total[k]||0, d=n-a, c=colorOf(k);
+function rankList(el, res, other, showDelta){
+  const ranked = Object.entries(res.total).sort((x,y)=>y[1]-x[1]||(other.total[y[0]]||0)-(other.total[x[0]]||0));
+  const shown = ranked.slice(0, 10), rest = ranked.slice(10), restSeats = rest.reduce((s,[,n])=>s+n,0);
+  el.innerHTML = shown.map(([k,n],i)=>{ const d = n-(other.total[k]||0), c = colorOf(k);
+    const sub = showDelta ? `<small class="${d>0?"up":d<0?"down":"same"}">${d>0?"▲ +"+d:d<0?"▼ "+d:"เท่าเดิม"}</small>` : `<small class="same">ที่นั่ง</small>`;
     return `<button class="rank" data-k="${k}" aria-pressed="${!highlight||highlight===k}" aria-label="อันดับ ${i+1} ${P[k]} ${n} ที่นั่ง">
-      <span class="rk" style="border-color:${c}">${i+1}</span>
-      <span class="nm">พรรค<b>${P[k]}</b></span>
-      <span class="seats"><b>${n}</b><small class="${d>0?"up":d<0?"down":"same"}">${d>0?"▲ +"+d:d<0?"▼ "+d:"เท่าเดิม"}</small></span></button>`; }).join("");
-  $("#ranks").querySelectorAll(".rank").forEach(b=>b.onclick=()=>{ highlight = highlight===b.dataset.k?null:b.dataset.k; render(); renderDistricts(); });
-  $("#legend").innerHTML = `<span>▲▼ เทียบกับกติกาจริง 2569</span>`
-    + (otherSeats?`<span><span class="sw" style="background:${PAL["--other"]}"></span>พรรคอื่น ${ranked.length-12} พรรค รวม ${otherSeats} ที่นั่ง</span>`:"")
-    + (R.missing?`<span><span class="sw" style="background:${PAL["--none"]}"></span>ไม่มีข้อมูล ${R.missing} เขต</span>`:"");
+      <span class="rk" style="border-color:${c}">${i+1}</span><span class="nm"><b>${P[k]}</b></span>
+      <span class="seats"><b>${n}</b>${sub}</span></button>`; }).join("")
+    + (rest.length ? `<div class="rank" style="cursor:default"><span class="rk" style="border-color:${PAL["--other"]}">+</span><span class="nm"><b>อื่น ๆ ${rest.length} พรรค</b></span><span class="seats"><b>${restSeats}</b><small class="same">ที่นั่ง</small></span></div>` : "");
+}
+function renderLegend(order, R){
+  rankList($("#ranks-actual"), A, R, false);
+  rankList($("#ranks-scen"), R, A, true);
+  document.querySelectorAll(".hemis .rank[data-k]").forEach(b=>b.onclick=()=>{ highlight = highlight===b.dataset.k?null:b.dataset.k; render(); renderDistricts(); });
+  $("#legend").innerHTML = `<span>▲▼ ฝั่งขวาเทียบกับกติกาจริง 2569</span>`
+    + (R.missing||A.missing?`<span><span class="sw" style="background:${PAL["--none"]}"></span>ไม่มีข้อมูล 3 เขต</span>`:"");
 }
 function lead(res){ return Object.entries(res.total).sort((a,b)=>b[1]-a[1])[0]; }
 function renderKpis(R){
