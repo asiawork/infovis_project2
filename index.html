@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one reading column; a rule switcher on top drives every chart below it (hemicycles → seat shift → fairness → coalition → districts). */
+/* Layout: one reading column; a rule switcher on top drives every chart below it (hemicycles → seat shift → proportionality → seat grouping → districts). */
 :root{
   --bg:#f6f7f9; --panel:#ffffff; --ink:#18202e; --ink-2:#4a5568; --muted:#7b8494; --line:#e1e5ec; --line-2:#cdd3dd;
   --accent:#a2421b; --accent-soft:#f6e4da; --majority:#18202e; --none:#c9ced8; --other:#9aa3b2;
@@ -64,9 +64,19 @@ select{padding:6px 8px;border:1px solid var(--line-2);border-radius:6px;backgrou
 .hemi-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .tag{font-family:var(--f-mono);font-size:11.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--line-2);color:var(--ink-2)}
 .tag.on{border-color:var(--accent);color:var(--accent)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
-.legend button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:2px 4px;border-radius:4px}
-.legend button[aria-pressed="false"]{opacity:.35}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.ranks{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr));gap:8px}
+.rank{appearance:none;font:inherit;color:inherit;text-align:left;cursor:pointer;display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}
+.rank:hover{border-color:var(--line-2)}
+.rank[aria-pressed="false"]{opacity:.35}
+.rank .rk{width:40px;height:40px;border-radius:50%;border:3.5px solid;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:19px;line-height:1}
+.rank .nm{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rank .nm b{display:block;font-family:var(--f-display);font-size:15px;font-weight:600;color:var(--ink)}
+.rank .seats{text-align:right;line-height:1.1}
+.rank .seats b{font-family:var(--f-display);font-size:28px;font-weight:700}
+.rank .seats small{display:block;font-size:11.5px;font-family:var(--f-mono)}
+.up{color:var(--p-kt)} .down{color:var(--accent)} .same{color:var(--muted)}
 .sw{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
 
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
@@ -85,10 +95,25 @@ select{padding:6px 8px;border:1px solid var(--line-2);border-radius:6px;backgrou
 .zero{stroke:var(--ink-2);stroke-width:1}
 
 /* coalition */
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{appearance:none;font:inherit;font-size:13px;border:1px solid var(--line-2);background:var(--panel);color:var(--ink);border-radius:99px;padding:4px 10px 4px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
-.chip .num{color:var(--ink-2);font-size:12px}
+.zones{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:12px}
+.zone{border:1.5px dashed var(--line-2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:170px;transition:background .15s,border-color .15s}
+.zone.over{border-color:var(--accent);background:var(--accent-soft)}
+.zone.gov{border-style:solid;border-color:var(--ink-2)}
+.zone-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.zone-head .tot{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1}
+.zone-head .tot small{font-size:12px;font-weight:500;color:var(--muted);font-family:var(--f-body)}
+.zone .hint{font-size:12.5px;color:var(--muted)}
+.cards{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.pcard{appearance:none;font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line-2);border-left:5px solid;border-radius:8px;padding:5px 9px;cursor:grab;display:inline-flex;align-items:baseline;gap:6px;touch-action:manipulation}
+.pcard b{font-family:var(--f-display);font-size:16px}
+.pcard small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.pcard:active{cursor:grabbing}
+.verdict{font-family:var(--f-display);font-size:18px;font-weight:600}
+#coal{display:flex;flex-direction:column;gap:8px}
+.coal-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{appearance:none;font:inherit;font-size:13px;border:1px solid var(--line-2);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn:hover{border-color:var(--ink-2)}
+@media (max-width:760px){ .zones{grid-template-columns:1fr} .zone{min-height:0} }
 .coal-row{display:grid;grid-template-columns:110px 1fr 76px;gap:10px;align-items:center;font-size:13px}
 .coal-bar{position:relative;height:22px;background:var(--bg);border-radius:4px;overflow:visible;display:flex}
 .coal-bar .seg{height:100%;border-right:2px solid var(--panel)}
@@ -131,7 +156,7 @@ footer a{color:var(--accent)}
   <header>
     <div class="eyebrow">เลือกตั้ง สส. 8 ก.พ. 2569 · คะแนนจริง · กติกาจำลอง</div>
     <h1>คะแนนเท่าเดิม สภาไม่เหมือนเดิม</h1>
-    <p class="lede">ไทยเปลี่ยนสูตรแปลงคะแนนเป็นที่นั่งแทบทุกครั้งที่แก้รัฐธรรมนูญ หน้านี้เอาคะแนนจริงของการเลือกตั้ง 2569 มานับที่นั่งใหม่ด้วยกติกาที่เคยใช้ในปี 2540, 2550, 2554 และ 2562 เพื่อดูว่าหน้าตาสภาและโอกาสตั้งรัฐบาลเปลี่ยนไปแค่ไหน</p>
+    <p class="lede">ระบบเลือกตั้งของไทยเคยใช้สูตรคำนวณที่นั่งหลายแบบ หน้านี้นำคะแนนการเลือกตั้ง 2569 มาคำนวณที่นั่งตามสูตรที่เคยใช้ในปี 2540, 2550, 2554 และ 2562 เพื่อศึกษาว่าสูตรคำนวณส่งผลต่อจำนวนที่นั่งอย่างไร เป็นการจำลองทางคณิตศาสตร์เพื่อการศึกษา ไม่ใช่การคาดการณ์ผลและไม่ได้สนับสนุนพรรคการเมืองใด</p>
   </header>
 
   <section class="panel" aria-labelledby="h-rule">
@@ -155,8 +180,8 @@ footer a{color:var(--accent)}
       <div class="knob"><label for="k-method">สูตรปัดเศษ</label>
         <select id="k-method">
           <option value="hare">เศษเหลือมากสุด (Hare)</option>
-          <option value="dhondt">ตัวหาร d'Hondt (เอื้อพรรคใหญ่)</option>
-          <option value="sainte">ตัวหาร Sainte-Laguë (กลาง)</option>
+          <option value="dhondt">ตัวหาร d'Hondt</option>
+          <option value="sainte">ตัวหาร Sainte-Laguë</option>
         </select></div>
       <div class="knob"><label for="k-src">คะแนนที่ใช้</label>
         <select id="k-src">
@@ -170,41 +195,48 @@ footer a{color:var(--accent)}
   <section class="panel" aria-labelledby="h-house">
     <div class="panel-head">
       <h2 id="h-house">หน้าตาสภา</h2>
-      <p class="sub">แต่ละจุดคือ สส. 1 คน เรียงพรรคตำแหน่งเดียวกันทั้งสองฝั่ง เส้นกลางคือจุดเสียงข้างมาก กดชื่อพรรคเพื่อเน้น</p>
+      <p class="sub">แต่ละจุดคือ สส. 1 คน เรียงพรรคตำแหน่งเดียวกันทั้งสองฝั่ง เส้นกลางคือเกณฑ์เสียงข้างมาก กดการ์ดพรรคเพื่อเน้น</p>
     </div>
     <div class="hemis">
       <div class="hemi"><div class="hemi-title"><h3>กติกาจริง 2569</h3><span class="tag" id="t-actual"></span></div><svg id="hemi-actual" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาจริง"></svg></div>
       <div class="hemi"><div class="hemi-title"><h3 id="scen-title">กติกาที่เลือก</h3><span class="tag on" id="t-scen"></span></div><svg id="hemi-scen" viewBox="0 0 400 220" role="img" aria-label="ที่นั่งตามกติกาที่เลือก"></svg></div>
     </div>
-    <div class="legend" id="legend" role="group" aria-label="เน้นพรรค"></div>
+    <div class="ranks" id="ranks" role="group" aria-label="อันดับพรรคตามกติกาที่เลือก กดเพื่อเน้น"></div>
+    <div class="legend" id="legend"></div>
     <div class="kpis" id="kpis"></div>
   </section>
 
   <div class="grid2">
     <section class="panel" aria-labelledby="h-shift">
-      <div class="panel-head"><h2 id="h-shift">ใครได้ ใครเสีย</h2>
+      <div class="panel-head"><h2 id="h-shift">ที่นั่งเปลี่ยนไปเท่าไร</h2>
         <p class="sub">วงกลมโปร่ง = ที่นั่งตามกติกาจริง, วงกลมทึบ = ตามกติกาที่เลือก</p></div>
       <div class="chart" id="shift"></div>
     </section>
     <section class="panel" aria-labelledby="h-fair">
       <div class="panel-head"><h2 id="h-fair">ที่นั่งสะท้อนคะแนนแค่ไหน</h2>
-        <p class="sub">% ที่นั่งในสภา ลบ % คะแนนบัญชีรายชื่อ ค่าบวก = ได้ที่นั่งเกินสัดส่วนคะแนน แท่งโปร่ง = กติกาจริง, แท่งทึบ = กติกาที่เลือก (ตัวเลข)</p></div>
+        <p class="sub">% ที่นั่งในสภา ลบ % คะแนนบัญชีรายชื่อ ค่าบวก = สัดส่วนที่นั่งสูงกว่าสัดส่วนคะแนน แท่งโปร่ง = กติกาจริง, แท่งทึบ = กติกาที่เลือก (ตัวเลข)</p></div>
       <div class="chart" id="fair"></div>
     </section>
   </div>
 
   <section class="panel" aria-labelledby="h-coal">
-    <div class="panel-head"><h2 id="h-coal">ลองจับขั้วรัฐบาล</h2>
-      <p class="sub">เลือกพรรคที่จะร่วมรัฐบาล ดูว่าขั้วเดียวกันถึงเสียงข้างมากไหมภายใต้แต่ละกติกา</p></div>
-    <div class="chips" id="chips" role="group" aria-label="พรรคร่วมรัฐบาล"></div>
+    <div class="panel-head"><h2 id="h-coal">จำลองการรวมเสียง</h2>
+      <p class="sub">ลากการ์ดพรรคไปกลุ่ม ก หรือกลุ่ม ข หรือแตะการ์ดเพื่อย้ายกลุ่ม (ยังไม่จัดกลุ่ม → กลุ่ม ก → กลุ่ม ข) เพื่อดูว่าผลรวมที่นั่งถึงเกณฑ์เสียงข้างมากหรือไม่ ตัวเลขบนการ์ดคือที่นั่งตามกติกาที่เลือก ตัวเล็กคือกติกาจริง</p></div>
+    <div class="zones" id="zones">
+      <div class="zone gov" data-zone="gov"><div class="zone-head"><h3>กลุ่ม ก</h3><span class="tot" id="tot-gov"></span></div><div class="cards"></div></div>
+      <div class="zone pool" data-zone="pool"><div class="zone-head"><h3>ยังไม่จัดกลุ่ม</h3><span class="tot" id="tot-pool"></span></div><div class="cards"></div></div>
+      <div class="zone opp" data-zone="opp"><div class="zone-head"><h3>กลุ่ม ข</h3><span class="tot" id="tot-opp"></span></div><div class="cards"></div></div>
+    </div>
+    <p class="verdict" id="verdict" aria-live="polite"></p>
     <div id="coal"></div>
+    <div class="coal-actions"><button class="btn" id="swap">สลับกลุ่ม ก/ข</button><button class="btn" id="reset">เริ่มใหม่</button></div>
   </section>
 
   <section class="panel" aria-labelledby="h-dist">
     <div class="panel-head"><h2 id="h-dist">400 เขต: ที่มาของที่นั่งเขต</h2>
-      <p class="sub">แต่ละช่องคือเขตเลือกตั้ง สีตามพรรคผู้ชนะ เลื่อนตัวกรองเพื่อดูเฉพาะเขตที่ชนะกันฉิวเฉียด ซึ่งเป็นเขตที่ที่นั่งพลิกได้ง่ายที่สุด แตะหรือชี้ที่ช่องเพื่อดูคะแนน</p></div>
+      <p class="sub">แต่ละช่องคือเขตเลือกตั้ง สีตามพรรคผู้ชนะ เลื่อนตัวกรองเพื่อดูเฉพาะเขตที่คะแนนอันดับ 1 และ 2 ห่างกันน้อย แตะหรือชี้ที่ช่องเพื่อดูคะแนน</p></div>
     <div class="dist-controls">
-      <div class="knob"><label for="k-margin">ชนะห่างไม่เกิน <output id="o-margin" class="num"></output></label>
+      <div class="knob"><label for="k-margin">คะแนนห่างไม่เกิน <output id="o-margin" class="num"></output></label>
         <input type="range" id="k-margin" min="1" max="100" step="1" value="100"></div>
       <p class="sub" id="dist-sum"></p>
     </div>
@@ -248,7 +280,7 @@ const fmt = n => n.toLocaleString("en-US");
 const pct = (n,d=1) => (n*100).toFixed(d)+"%";
 
 let D, P, PROV, distWin = {}, votes = {pl:{},cs:{}}, groupVotes = {pl:{},cs:{}};
-let cfg = {...BASE}, activePreset = "y2569", highlight = null, coalition = new Set();
+let cfg = {...BASE}, activePreset = "y2569", highlight = null, side = {}, sideInit = false;
 
 let PAL = {};
 function readPalette(){ const cs = getComputedStyle(document.documentElement); PAL = {};
@@ -322,8 +354,8 @@ function drawHemi(svg, res, order){
   L.pts.forEach((p,i)=>{ const k=seq[i]; const dim = highlight && k!==highlight;
     h += `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${L.dot.toFixed(2)}" fill="${k?colorOf(k):PAL["--none"]}" ${dim?'opacity="0.15"':''}><title>${k?P[k]:"ไม่มีข้อมูล"}</title></circle>`; });
   const lead = Object.entries(res.total).sort((a,b)=>b[1]-a[1])[0];
-  h += `<text x="${L.cx}" y="${L.cy-26}" text-anchor="middle" style="font-family:var(--f-display);font-size:28px;font-weight:700;fill:var(--ink)">${lead[1]}</text>`;
-  h += `<text x="${L.cx}" y="${L.cy-6}" text-anchor="middle" class="lab">${P[lead[0]]} · เสียงข้างมาก ${res.majority}</text>`;
+  h += `<text x="${L.cx}" y="${L.cy-26}" text-anchor="middle" style="font-family:var(--f-display);font-size:28px;font-weight:700;fill:var(--ink)">${res.house-res.missing}<tspan style="font-size:15px;fill:var(--muted)">/${res.house}</tspan></text>`;
+  h += `<text x="${L.cx}" y="${L.cy-6}" text-anchor="middle" class="lab">เสียงข้างมาก ${res.majority} ที่นั่ง</text>`;
   svg.innerHTML = h;
 }
 
@@ -347,19 +379,25 @@ function describe(c){
   return `${m}, บัญชีรายชื่อ ${c.pl} ที่นั่ง, เกณฑ์ขั้นต่ำ ${c.thr}%, สูตร ${$("#k-method").selectedOptions[0].text}, ใช้คะแนน${c.src==="pl"?"บัตรบัญชีรายชื่อ":"บัตรแบ่งเขต"}`;
 }
 function renderLegend(order, R){
-  const shown = order.filter(k => (A.total[k]||0)+(R.total[k]||0) >= 3).slice(0,10);
-  const others = order.filter(k=>!shown.includes(k)).reduce((s,k)=>s+(R.total[k]||0),0);
-  $("#legend").innerHTML = shown.map(k=>`<button data-k="${k}" aria-pressed="${!highlight||highlight===k}"><span class="sw" style="background:${colorOf(k)}"></span>${P[k]} <span class="num">${A.total[k]||0}→${R.total[k]||0}</span></button>`).join("")
-    + (others?`<span><span class="sw" style="background:var(--other)"></span> พรรคอื่น <span class="num">${others}</span></span>`:"")
-    + `<span><span class="sw" style="background:var(--none)"></span> ไม่มีข้อมูล</span>`;
-  $("#legend").querySelectorAll("button").forEach(b=>b.onclick=()=>{ highlight = highlight===b.dataset.k?null:b.dataset.k; render(); renderDistricts(); });
+  const ranked = Object.entries(R.total).sort((x,y)=>y[1]-x[1]||(A.total[y[0]]||0)-(A.total[x[0]]||0));
+  const shown = ranked.slice(0, 12);
+  const otherSeats = ranked.slice(12).reduce((s,[,n])=>s+n,0);
+  $("#ranks").innerHTML = shown.map(([k,n],i)=>{ const a=A.total[k]||0, d=n-a, c=colorOf(k);
+    return `<button class="rank" data-k="${k}" aria-pressed="${!highlight||highlight===k}" aria-label="อันดับ ${i+1} ${P[k]} ${n} ที่นั่ง">
+      <span class="rk" style="border-color:${c}">${i+1}</span>
+      <span class="nm">พรรค<b>${P[k]}</b></span>
+      <span class="seats"><b>${n}</b><small class="${d>0?"up":d<0?"down":"same"}">${d>0?"▲ +"+d:d<0?"▼ "+d:"เท่าเดิม"}</small></span></button>`; }).join("");
+  $("#ranks").querySelectorAll(".rank").forEach(b=>b.onclick=()=>{ highlight = highlight===b.dataset.k?null:b.dataset.k; render(); renderDistricts(); });
+  $("#legend").innerHTML = `<span>▲▼ เทียบกับกติกาจริง 2569</span>`
+    + (otherSeats?`<span><span class="sw" style="background:${PAL["--other"]}"></span>พรรคอื่น ${ranked.length-12} พรรค รวม ${otherSeats} ที่นั่ง</span>`:"")
+    + (R.missing?`<span><span class="sw" style="background:${PAL["--none"]}"></span>ไม่มีข้อมูล ${R.missing} เขต</span>`:"");
 }
 function lead(res){ return Object.entries(res.total).sort((a,b)=>b[1]-a[1])[0]; }
 function renderKpis(R){
   const [lk,ls] = lead(R), [ak,as] = lead(A);
   const kp = [
     {k:"พรรคอันดับ 1", v:`${P[lk]} ${ls}`, d: lk===ak ? `กติกาจริง ${as} ที่นั่ง (${ls-as>=0?"+":""}${ls-as})` : `กติกาจริงอันดับ 1 คือ ${P[ak]} ${as}`, flag: lk!==ak},
-    {k:"พรรคเดียวครองเสียงข้างมาก?", v: ls>=R.majority?"ได้":"ไม่ได้", d:`ต้องได้ ${R.majority} ขาดอีก ${Math.max(0,R.majority-ls)} ที่นั่ง`},
+    {k:"พรรคอันดับ 1 ถึงเกณฑ์เสียงข้างมาก", v: ls>=R.majority?"ถึง":"ไม่ถึง", d:`เกณฑ์ ${R.majority} ที่นั่ง`},
     {k:"ดัชนีความไม่สมสัดส่วน (Gallagher)", v: R.gallagher.toFixed(1), d:`กติกาจริง ${A.gallagher.toFixed(1)} · ยิ่งต่ำยิ่งสะท้อนคะแนน`, flag: Math.abs(R.gallagher-A.gallagher)>2},
     {k:"จำนวนพรรคในสภา", v: R.nParties, d:`กติกาจริง ${A.nParties} พรรค`},
   ];
@@ -402,16 +440,40 @@ function renderFair(R, order){
   });
   $("#fair").innerHTML = s+"</svg>";
 }
+let lastR = null;
 function renderCoal(R, order){
-  const ks = topParties(R, order, 12);
-  if(!coalition.size){ const [k]=lead(A); coalition.add(k); }
-  $("#chips").innerHTML = ks.map(k=>`<button class="chip" data-k="${k}" aria-pressed="${coalition.has(k)}"><span class="sw" style="background:${colorOf(k)}"></span>${P[k]} <span class="num">${A.total[k]||0}/${R.total[k]||0}</span></button>`).join("");
-  $("#chips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; coalition.has(k)?coalition.delete(k):coalition.add(k); renderCoal(R, order); });
-  const row = (label, res) => { const mem=[...coalition].filter(k=>res.total[k]); const tot=mem.reduce((s,k)=>s+res.total[k],0), ok=tot>=res.majority;
-    return `<div class="coal-row"><span>${label}</span><div class="coal-bar" role="img" aria-label="${label} ${tot} จาก ${res.house}">${mem.map(k=>`<div class="seg" style="width:${res.total[k]/res.house*100}%;background:${colorOf(k)}" title="${P[k]} ${res.total[k]}"></div>`).join("")}<div class="maj" style="left:${res.majority/res.house*100}%"></div></div><span class="coal-status num ${ok?"ok":"no"}">${tot}/${res.majority} ${ok?"✓":"✗"}</span></div>`; };
-  const pre = PRESETS.find(p=>p.id===activePreset);
-  $("#coal").innerHTML = row("กติกาจริง 2569", A) + row(pre?`กติกา ${pre.label}`:"ปรับเอง", R);
+  lastR = R;
+  if(!sideInit){ const [k]=lead(A); side[k]="gov"; sideInit = true; }
+  const ks = order.filter(k=>(A.total[k]||0)+(R.total[k]||0)>0).sort((x,y)=>(R.total[y]||0)-(R.total[x]||0)||(A.total[y]||0)-(A.total[x]||0));
+  const zoneOf = k => side[k]||"pool";
+  ["gov","pool","opp"].forEach(z=>{
+    const el = document.querySelector(`.zone[data-zone="${z}"] .cards`);
+    const mine = ks.filter(k=>zoneOf(k)===z);
+    el.innerHTML = mine.length ? mine.map(k=>`<button class="pcard" draggable="true" data-k="${k}" style="border-left-color:${colorOf(k)}" aria-label="${P[k]} ${R.total[k]||0} ที่นั่ง อยู่${{gov:"กลุ่ม ก",pool:"ยังไม่จัดกลุ่ม",opp:"กลุ่ม ข"}[z]} แตะเพื่อย้าย">${P[k]} <b>${R.total[k]||0}</b><small>${A.total[k]||0}</small></button>`).join("")
+      : `<span class="hint">${z==="pool"?"จัดกลุ่มครบแล้ว":"ลากการ์ดพรรคมาวางที่นี่"}</span>`;
+    const tR = mine.reduce((s,k)=>s+(R.total[k]||0),0), tA = mine.reduce((s,k)=>s+(A.total[k]||0),0);
+    $("#tot-"+z).innerHTML = `${tR} <small>ที่นั่ง · จริง ${tA}</small>`;
+  });
+  const gov = ks.filter(k=>zoneOf(k)==="gov");
+  const gR = gov.reduce((s,k)=>s+(R.total[k]||0),0), gA = gov.reduce((s,k)=>s+(A.total[k]||0),0);
+  const okR = gR>=R.majority, okA = gA>=A.majority, pre = PRESETS.find(p=>p.id===activePreset), nm = pre?`กติกา ${pre.label}`:"กติกาที่ปรับเอง";
+  $("#verdict").innerHTML = !gov.length ? "ยังไม่มีพรรคในกลุ่ม ก"
+    : okR===okA ? (okR ? `กลุ่ม ก ถึงเกณฑ์เสียงข้างมากทั้งสองสูตร` : `กลุ่ม ก ยังไม่ถึงเกณฑ์เสียงข้างมากทั้งสองสูตร <span class="sub">ต่างจากเกณฑ์ ${R.majority-gR} ที่นั่งตาม${nm}</span>`)
+    : okR ? `กลุ่ม ก ถึงเกณฑ์ตาม${nm} แต่ไม่ถึงตามกติกาจริง` : `กลุ่ม ก ไม่ถึงเกณฑ์ตาม${nm} แต่ถึงตามกติกาจริง`;
+  const row = (label, res) => { const mem=gov.filter(k=>res.total[k]); const tot=mem.reduce((s,k)=>s+res.total[k],0), ok=tot>=res.majority;
+    return `<div class="coal-row"><span>${label}</span><div class="coal-bar" role="img" aria-label="${label} กลุ่ม ก ${tot} จาก ${res.house}">${mem.map(k=>`<div class="seg" style="width:${res.total[k]/res.house*100}%;background:${colorOf(k)}" title="${P[k]} ${res.total[k]}"></div>`).join("")}<div class="maj" style="left:${res.majority/res.house*100}%"></div></div><span class="coal-status num ${ok?"ok":"no"}">${tot}/${res.majority} ${ok?"✓":"✗"}</span></div>`; };
+  $("#coal").innerHTML = row("กติกาจริง 2569", A) + row(nm, R);
 }
+function cycleSide(k){ const z = side[k]||"pool"; const nx = {pool:"gov", gov:"opp", opp:"pool"}[z]; if(nx==="pool") delete side[k]; else side[k]=nx; renderCoal(lastR, partyOrder(lastR)); }
+function moveSide(k, z){ if(z==="pool") delete side[k]; else side[k]=z; renderCoal(lastR, partyOrder(lastR)); }
+const zones = $("#zones");
+zones.addEventListener("click", e=>{ const c=e.target.closest(".pcard"); if(c) cycleSide(c.dataset.k); });
+zones.addEventListener("dragstart", e=>{ const c=e.target.closest(".pcard"); if(c){ e.dataTransfer.setData("text/plain", c.dataset.k); e.dataTransfer.effectAllowed="move"; } });
+zones.addEventListener("dragover", e=>{ const z=e.target.closest(".zone"); if(z){ e.preventDefault(); zones.querySelectorAll(".zone").forEach(x=>x.classList.toggle("over", x===z)); } });
+zones.addEventListener("dragleave", e=>{ if(!zones.contains(e.relatedTarget)) zones.querySelectorAll(".zone").forEach(x=>x.classList.remove("over")); });
+zones.addEventListener("drop", e=>{ const z=e.target.closest(".zone"); zones.querySelectorAll(".zone").forEach(x=>x.classList.remove("over")); if(!z) return; e.preventDefault(); const k=e.dataTransfer.getData("text/plain"); if(k) moveSide(k, z.dataset.zone); });
+$("#swap").onclick = ()=>{ for(const k in side) side[k] = side[k]==="gov"?"opp":"gov"; renderCoal(lastR, partyOrder(lastR)); };
+$("#reset").onclick = ()=>{ for(const k in side) delete side[k]; renderCoal(lastR, partyOrder(lastR)); };
 function renderTable(R, order){
   const v=votes[cfg.src], vt=sum(v);
   const ks = order.filter(k=>(R.total[k]||0)||(A.total[k]||0));

@@ -4,7 +4,9 @@ Visual analytics prototype: re-count the seats of the 2026 (2569) Thai general e
 formulas Thailand used in 2540, 2550, 2554 and 2562, and compare with the actual 2569 rule.
 
 **Users & goal:** electoral-system researchers / civil-society groups / legislators reviewing election law —
-*which seat formula changes the shape of the House, and who gains or loses?*
+*how does the seat formula change the composition of the House?*
+
+This is a mathematical simulation for education; it is not a forecast and does not support any party.
 
 ## Run
 Static site — open via any web server (GitHub Pages works as-is):
@@ -18,9 +20,9 @@ python3 -m http.server 8000   # then open http://localhost:8000
 | Rule switcher + knobs | presets, sliders, selects (dynamic query) | define a counterfactual rule |
 | Two hemicycles | parliament chart, juxtaposed comparison, click-legend highlight | compare House composition, majority line |
 | KPI row | summary numbers | largest party, single-party majority, Gallagher index, # parties |
-| Dumbbell chart | actual → scenario seats, tooltip | who gains / loses seats |
-| Disproportionality bars | diverging bars (seat% − vote%), actual vs scenario | how fair each rule is |
-| Coalition builder | toggle chips, stacked bar vs majority line | can a coalition govern under each rule |
+| Dumbbell chart | actual → scenario seats, tooltip | how many seats change per party |
+| Disproportionality bars | diverging bars (seat% − vote%), actual vs scenario | how proportional each formula is |
+| Seat-grouping simulator | drag/tap party cards into group A / B, stacked bar vs majority line | does a group of parties reach a majority under each formula |
 | 400-district unit chart | grouped by region, margin filter, party highlight, tooltip | where district seats come from; marginal seats |
 | Table | details-on-demand / accessible fallback | exact numbers |
 
